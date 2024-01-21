@@ -6,7 +6,8 @@ import Error from "./components/Error";
 import StartScreen from "./components/StartScreen"
 import Question from "./components/Question";
 import NextButton from "./components/NextButton";
-
+import Progress from "./components/Progress";
+import FinishScreen from "./components/FinishScreen";
 const initialState = {
   questions:[],
   // 'loading', 'error', 'ready', 'active', 'finished'
@@ -14,6 +15,7 @@ const initialState = {
   index:0,
   answer:null,
   points:0,
+  heighscore:0,
 }
 
 function reducer(state,{type,payload}){
@@ -39,16 +41,28 @@ function reducer(state,{type,payload}){
 
       case 'nextQuestion':
         return {...state,index:state.index + 1, answer:null};
-    
-      default:
+      
+        case 'finished':
+        return {...state,status:"finished",heighscore:
+      state.points > state.heighscore ? state.points : state.heighscore};
+      
+      case 'restart':
+        return {...initialState,questions:state.questions,
+        status:'ready'};
+      
+        default:
       throw new Error("Action unknown");
     
   }
 }
 function App() {
- const [{questions,status,index,answer,points},dispatch] = useReducer(reducer,initialState);
+ const [{questions,status,index,answer,points,heighscore},dispatch] = useReducer(reducer,initialState);
 
  const numQuestion = questions.length;
+ 
+
+ const maxPossiblePoints = questions.reduce((prev,cur)=> prev + cur.points,0);
+
   useEffect(()=>{
     fetch(`http://localhost:8000/questions`)
     .then(res=>res.json())
@@ -68,20 +82,35 @@ function App() {
     />}
    {status === 'active' &&
    <>
+   <Progress index={index} 
+   numQuestion={numQuestion}
+   points={points}
+   maxPossiblePoints={maxPossiblePoints}
+   answer={answer}
+   />
     <Question
    question={questions[index]} 
    dispatch={dispatch}
    answer={answer}
    points={points}
    />
-   { 
+  
    <NextButton 
    dispatch={dispatch}
    answer={answer}
-   />}
+   index={index}
+   numQuestion={numQuestion}
+   />
    
    </>
   }
+  {status === 'finished' && (
+    <FinishScreen points={points}
+     maxPossiblePoints={maxPossiblePoints}
+     heighscore={heighscore}
+     dispatch={dispatch}
+     />
+  )}
    
    </Main>
     </div>
