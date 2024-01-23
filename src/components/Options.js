@@ -1,7 +1,10 @@
 import React from 'react'
+import { useQuiz } from '../context/QuizContext'
 
-function Options({question,answer,dispatch}) {
-const hasAnswered = answer !== null
+function Options({question}) {
+const {answer,dispatch} = useQuiz();
+  const hasAnswered = answer !== null
+
   return (
     <ul className='options'>
     {question.options.map((option,index)=>

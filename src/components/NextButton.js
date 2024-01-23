@@ -1,8 +1,11 @@
 import React from 'react'
+import { useQuiz } from '../context/QuizContext';
 
-function NextButton({dispatch,answer,index,numQuestion}) {
+function NextButton() {
+  const {dispatch,answer,index,numQuestion} = useQuiz();
     if(answer === null) return null;
     if(index < numQuestion -1)
+    
   return (
     <button 
     className='btn btn-ui'
